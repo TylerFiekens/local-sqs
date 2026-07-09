@@ -17,18 +17,22 @@ import (
 // Queues and messages are held in memory and lost on shutdown.
 // Server is safe for concurrent use.
 type Server struct {
-	mux    *http.ServeMux
-	queues map[string]*queue.Queue
-	mu     sync.RWMutex
+	baseURL string
+	mux     *http.ServeMux
+	queues  map[string]*queue.Queue
+	mu      sync.RWMutex
 }
 
 // New creates a Server with no queues and registers all HTTP routes.
-func New() *Server {
+// baseURL is used to construct queue URLs returned to clients (e.g. "http://localhost:9324").
+func New(baseURL string) *Server {
 	s := &Server{
-		mux:    http.NewServeMux(),
-		queues: make(map[string]*queue.Queue),
+		baseURL: baseURL,
+		mux:     http.NewServeMux(),
+		queues:  make(map[string]*queue.Queue),
 	}
 	s.mux.HandleFunc("/", s.handleSQS)
+	s.mux.HandleFunc("/openapi.yaml", s.handleOpenAPI)
 	return s
 }
 
@@ -52,18 +56,25 @@ func (s *Server) handleSQS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	action := r.FormValue("Action")
-	if action == "" {
+	a := action(r.FormValue("Action"))
+	if a == "" {
 		writeError(w, http.StatusBadRequest, "MissingAction", "Action is required")
 		return
 	}
 
-	log.Printf("action=%s", action)
+	log.Printf("action=%s", a)
 
-	switch action {
+	switch a {
+	case actionCreateQueue:
+		s.handleCreateQueue(w, r)
 	default:
-		writeError(w, http.StatusBadRequest, "InvalidAction", fmt.Sprintf("action %q not implemented", action))
+		writeError(w, http.StatusBadRequest, "InvalidAction", fmt.Sprintf("action %q not implemented", a))
 	}
+}
+
+// responseMetadata is included in every successful SQS response envelope.
+type responseMetadata struct {
+	RequestID string `xml:"RequestId"`
 }
 
 // errorResponse is the top-level XML envelope returned on any SQS API error.

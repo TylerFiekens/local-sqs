@@ -18,9 +18,11 @@ func main() {
 	flag.Parse()
 
 	addr := fmt.Sprintf(":%d", *port)
+	baseURL := fmt.Sprintf("http://localhost%s", addr)
+
 	log.Printf("local-sqs listening on %s", addr)
 
-	if err := http.ListenAndServe(addr, server.New()); err != nil {
+	if err := http.ListenAndServe(addr, server.New(baseURL)); err != nil {
 		log.Fatalf("server error: %v", err)
 	}
 }

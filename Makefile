@@ -8,6 +8,9 @@ IMAGE_TAG  ?= latest
 
 all: fmt lint test build
 
+run:
+	go run $(GOFLAGS) $(MAIN)
+
 build:
 	go build $(GOFLAGS) -o bin/$(BINARY) $(MAIN)
 

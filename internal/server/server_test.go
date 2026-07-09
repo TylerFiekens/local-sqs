@@ -33,7 +33,7 @@ func parseError(t *testing.T, body string) errorResponse {
 }
 
 func TestNew_emptyQueues(t *testing.T) {
-	s := New()
+	s := New("http://localhost:9324")
 	if s.queues == nil {
 		t.Fatal("queues map must be initialized")
 	}
@@ -43,7 +43,7 @@ func TestNew_emptyQueues(t *testing.T) {
 }
 
 func TestHandleSQS_methodNotAllowed(t *testing.T) {
-	s := New()
+	s := New("http://localhost:9324")
 	for _, method := range []string{http.MethodGet, http.MethodPut, http.MethodDelete, http.MethodPatch} {
 		req := httptest.NewRequest(method, "/", nil)
 		rr := httptest.NewRecorder()
@@ -55,7 +55,7 @@ func TestHandleSQS_methodNotAllowed(t *testing.T) {
 }
 
 func TestHandleSQS_missingAction(t *testing.T) {
-	s := New()
+	s := New("http://localhost:9324")
 	rr := post(t, s, url.Values{})
 
 	if rr.Code != http.StatusBadRequest {
@@ -68,7 +68,7 @@ func TestHandleSQS_missingAction(t *testing.T) {
 }
 
 func TestHandleSQS_unknownAction(t *testing.T) {
-	s := New()
+	s := New("http://localhost:9324")
 	rr := post(t, s, url.Values{"Action": {"DoSomethingFake"}})
 
 	if rr.Code != http.StatusBadRequest {
@@ -84,7 +84,7 @@ func TestHandleSQS_unknownAction(t *testing.T) {
 }
 
 func TestHandleSQS_parseFormError(t *testing.T) {
-	s := New()
+	s := New("http://localhost:9324")
 	req := httptest.NewRequest(http.MethodPost, "/", errReader{})
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	rr := httptest.NewRecorder()
@@ -100,7 +100,7 @@ func TestHandleSQS_parseFormError(t *testing.T) {
 }
 
 func TestHandleSQS_contentType(t *testing.T) {
-	s := New()
+	s := New("http://localhost:9324")
 	rr := post(t, s, url.Values{})
 
 	if ct := rr.Header().Get("Content-Type"); ct != "text/xml" {

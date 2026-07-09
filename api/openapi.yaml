@@ -1,0 +1,140 @@
+openapi: "3.0.3"
+
+info:
+  title: local-sqs
+  description: |
+    A lightweight, in-memory SQS-compatible server for local development and testing.
+
+    All operations use the [SQS Query API](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/query-interface.html):
+    a single `POST /` endpoint with `Content-Type: application/x-www-form-urlencoded`.
+    The `Action` field in the request body determines which operation is performed.
+  version: "0.1.0"
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:9324
+    description: Default local server
+
+paths:
+  /:
+    post:
+      summary: SQS Query API endpoint
+      description: |
+        Single entry point for all SQS operations. The `Action` field selects
+        the operation. All requests must use `application/x-www-form-urlencoded`.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/CreateQueueRequest"
+              discriminator:
+                propertyName: Action
+      responses:
+        "200":
+          description: Operation succeeded
+          content:
+            text/xml:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/CreateQueueResponse"
+        "400":
+          description: Bad request — missing or invalid parameters, or unimplemented action
+          content:
+            text/xml:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "405":
+          description: Method not allowed — only POST is accepted
+
+  /openapi.yaml:
+    get:
+      summary: OpenAPI specification
+      description: Returns this OpenAPI specification in YAML format.
+      responses:
+        "200":
+          description: OpenAPI YAML document
+          content:
+            application/yaml:
+              schema:
+                type: string
+
+components:
+  schemas:
+
+    # -------------------------------------------------------------------------
+    # CreateQueue
+    # -------------------------------------------------------------------------
+
+    CreateQueueRequest:
+      type: object
+      required:
+        - Action
+        - QueueName
+      properties:
+        Action:
+          type: string
+          enum: [CreateQueue]
+        QueueName:
+          type: string
+          minLength: 1
+          maxLength: 80
+          pattern: "^[a-zA-Z0-9_-]{1,80}$"
+          description: |
+            Queue name. 1–80 characters; alphanumeric, hyphens, and underscores only.
+            Calling CreateQueue with an existing name is idempotent and returns the
+            existing queue URL.
+          example: my-queue
+
+    CreateQueueResponse:
+      type: object
+      xml:
+        name: CreateQueueResponse
+      properties:
+        CreateQueueResult:
+          type: object
+          properties:
+            QueueUrl:
+              type: string
+              description: Full URL of the created or existing queue.
+              example: http://localhost:9324/queue/my-queue
+        ResponseMetadata:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+    # -------------------------------------------------------------------------
+    # Shared
+    # -------------------------------------------------------------------------
+
+    ResponseMetadata:
+      type: object
+      xml:
+        name: ResponseMetadata
+      properties:
+        RequestId:
+          type: string
+          example: local
+
+    ErrorResponse:
+      type: object
+      xml:
+        name: ErrorResponse
+      properties:
+        Error:
+          type: object
+          properties:
+            Type:
+              type: string
+              example: Sender
+            Code:
+              type: string
+              description: Machine-readable error code.
+              example: InvalidParameterValue
+            Message:
+              type: string
+              description: Human-readable error description.
+              example: "QueueName is required"
+        RequestId:
+          type: string
+          example: local
