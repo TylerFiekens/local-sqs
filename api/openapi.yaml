@@ -31,6 +31,7 @@ paths:
               oneOf:
                 - $ref: "#/components/schemas/CreateQueueRequest"
                 - $ref: "#/components/schemas/DeleteQueueRequest"
+                - $ref: "#/components/schemas/ListQueuesRequest"
               discriminator:
                 propertyName: Action
       responses:
@@ -42,6 +43,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/CreateQueueResponse"
                   - $ref: "#/components/schemas/DeleteQueueResponse"
+                  - $ref: "#/components/schemas/ListQueuesResponse"
         "400":
           description: Bad request — missing or invalid parameters, or unimplemented action
           content:
@@ -130,6 +132,41 @@ components:
       xml:
         name: DeleteQueueResponse
       properties:
+        ResponseMetadata:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+    # -------------------------------------------------------------------------
+    # ListQueues
+    # -------------------------------------------------------------------------
+
+    ListQueuesRequest:
+      type: object
+      required:
+        - Action
+      properties:
+        Action:
+          type: string
+          enum: [ListQueues]
+        QueueNamePrefix:
+          type: string
+          description: Filter results to queues whose names begin with this prefix. Optional.
+          example: order-
+
+    ListQueuesResponse:
+      type: object
+      xml:
+        name: ListQueuesResponse
+      properties:
+        ListQueuesResult:
+          type: object
+          properties:
+            QueueUrl:
+              type: array
+              items:
+                type: string
+              description: URLs of matching queues, sorted alphabetically.
+              example:
+                - http://localhost:9324/queue/my-queue
         ResponseMetadata:
           $ref: "#/components/schemas/ResponseMetadata"
 
