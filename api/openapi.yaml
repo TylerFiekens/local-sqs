@@ -30,6 +30,7 @@ paths:
             schema:
               oneOf:
                 - $ref: "#/components/schemas/CreateQueueRequest"
+                - $ref: "#/components/schemas/DeleteQueueRequest"
               discriminator:
                 propertyName: Action
       responses:
@@ -40,6 +41,7 @@ paths:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/CreateQueueResponse"
+                  - $ref: "#/components/schemas/DeleteQueueResponse"
         "400":
           description: Bad request — missing or invalid parameters, or unimplemented action
           content:
@@ -100,6 +102,34 @@ components:
               type: string
               description: Full URL of the created or existing queue.
               example: http://localhost:9324/queue/my-queue
+        ResponseMetadata:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+    # -------------------------------------------------------------------------
+    # DeleteQueue
+    # -------------------------------------------------------------------------
+
+    DeleteQueueRequest:
+      type: object
+      required:
+        - Action
+        - QueueUrl
+      properties:
+        Action:
+          type: string
+          enum: [DeleteQueue]
+        QueueUrl:
+          type: string
+          description: |
+            Full URL of the queue to delete, as returned by CreateQueue.
+            Deleting a non-existent queue is idempotent and returns 200.
+          example: http://localhost:9324/queue/my-queue
+
+    DeleteQueueResponse:
+      type: object
+      xml:
+        name: DeleteQueueResponse
+      properties:
         ResponseMetadata:
           $ref: "#/components/schemas/ResponseMetadata"
 
