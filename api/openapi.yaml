@@ -32,6 +32,7 @@ paths:
                 - $ref: "#/components/schemas/CreateQueueRequest"
                 - $ref: "#/components/schemas/DeleteQueueRequest"
                 - $ref: "#/components/schemas/ListQueuesRequest"
+                - $ref: "#/components/schemas/SendMessageRequest"
               discriminator:
                 propertyName: Action
       responses:
@@ -44,6 +45,7 @@ paths:
                   - $ref: "#/components/schemas/CreateQueueResponse"
                   - $ref: "#/components/schemas/DeleteQueueResponse"
                   - $ref: "#/components/schemas/ListQueuesResponse"
+                  - $ref: "#/components/schemas/SendMessageResponse"
         "400":
           description: Bad request — missing or invalid parameters, or unimplemented action
           content:
@@ -167,6 +169,48 @@ components:
               description: URLs of matching queues, sorted alphabetically.
               example:
                 - http://localhost:9324/queue/my-queue
+        ResponseMetadata:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+    # -------------------------------------------------------------------------
+    # SendMessage
+    # -------------------------------------------------------------------------
+
+    SendMessageRequest:
+      type: object
+      required:
+        - Action
+        - QueueUrl
+        - MessageBody
+      properties:
+        Action:
+          type: string
+          enum: [SendMessage]
+        QueueUrl:
+          type: string
+          description: Full URL of the target queue, as returned by CreateQueue.
+          example: http://localhost:9324/queue/my-queue
+        MessageBody:
+          type: string
+          description: The message payload. Must not be empty.
+          example: '{"orderId": "123"}'
+
+    SendMessageResponse:
+      type: object
+      xml:
+        name: SendMessageResponse
+      properties:
+        SendMessageResult:
+          type: object
+          properties:
+            MessageId:
+              type: string
+              description: Unique identifier assigned to the message.
+              example: 5fea7756-0ea4-451a-a703-a558b933e274
+            MD5OfMessageBody:
+              type: string
+              description: MD5 digest of the message body.
+              example: 5eb63bbbe01eeed093cb22bb8f5acdc3
         ResponseMetadata:
           $ref: "#/components/schemas/ResponseMetadata"
 

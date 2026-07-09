@@ -71,6 +71,8 @@ func (s *Server) handleSQS(w http.ResponseWriter, r *http.Request) {
 		s.handleDeleteQueue(w, r)
 	case actionListQueues:
 		s.handleListQueues(w, r)
+	case actionSendMessage:
+		s.handleSendMessage(w, r)
 	default:
 		writeError(w, http.StatusBadRequest, "InvalidAction", fmt.Sprintf("action %q not implemented", a))
 	}
