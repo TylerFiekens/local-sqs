@@ -43,3 +43,18 @@ make docker-build   # build Docker image
 ```
 
 A pre-built Docker image will be available in a future release.
+
+## Contributing
+
+1. Fork the repo and create a branch from `main`.
+2. Make your changes with tests covering new behaviour.
+3. Run `make check` — all checks must pass before opening a PR.
+4. Open a pull request against `main` with a clear description of what and why.
+
+## Issues
+
+Found a bug or missing operation? [Open an issue](https://github.com/tylerfiekens/local-sqs/issues/new) with:
+
+- What you did
+- What you expected
+- What happened (include logs or error output where relevant)
