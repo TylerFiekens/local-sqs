@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: fmt
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "Code not formatted. Run: gofmt -w ."
+            gofmt -l .
+            exit 1
+          fi
+
+      - name: lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+      - name: test
+        run: go test -race -cover ./...
+
+      - name: build
+        run: go build -trimpath -o /dev/null .
