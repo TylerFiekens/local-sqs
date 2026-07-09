@@ -34,6 +34,7 @@ paths:
                 - $ref: "#/components/schemas/ListQueuesRequest"
                 - $ref: "#/components/schemas/SendMessageRequest"
                 - $ref: "#/components/schemas/ReceiveMessageRequest"
+                - $ref: "#/components/schemas/DeleteMessageRequest"
               discriminator:
                 propertyName: Action
       responses:
@@ -48,6 +49,7 @@ paths:
                   - $ref: "#/components/schemas/ListQueuesResponse"
                   - $ref: "#/components/schemas/SendMessageResponse"
                   - $ref: "#/components/schemas/ReceiveMessageResponse"
+                  - $ref: "#/components/schemas/DeleteMessageResponse"
         "400":
           description: Bad request — missing or invalid parameters, or unimplemented action
           content:
@@ -265,6 +267,38 @@ components:
                   Body:
                     type: string
                     example: '{"orderId": "123"}'
+        ResponseMetadata:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+    # -------------------------------------------------------------------------
+    # DeleteMessage
+    # -------------------------------------------------------------------------
+
+    DeleteMessageRequest:
+      type: object
+      required:
+        - Action
+        - QueueUrl
+        - ReceiptHandle
+      properties:
+        Action:
+          type: string
+          enum: [DeleteMessage]
+        QueueUrl:
+          type: string
+          description: Full URL of the queue containing the message.
+          example: http://localhost:9324/queue/my-queue
+        ReceiptHandle:
+          type: string
+          description: |
+            The ReceiptHandle returned by ReceiveMessage. Deleting an unknown
+            ReceiptHandle is idempotent and returns 200.
+
+    DeleteMessageResponse:
+      type: object
+      xml:
+        name: DeleteMessageResponse
+      properties:
         ResponseMetadata:
           $ref: "#/components/schemas/ResponseMetadata"
 
