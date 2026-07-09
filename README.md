@@ -4,7 +4,7 @@ A lightweight, in-memory SQS-compatible server for local development and testing
 
 ## Status
 
-Early development. Server boots and speaks the SQS query protocol. No queue operations implemented yet.
+Early development. `CreateQueue` is implemented. Remaining operations are stubs.
 
 ## How it works
 
@@ -20,11 +20,13 @@ go run . -port 9324
 
 Point your AWS SDK at `http://localhost:9324` with any credentials (not validated).
 
+The OpenAPI specification is served at `http://localhost:9324/openapi.yaml`.
+
 ## Implemented operations
 
 | Operation | Status |
 |---|---|
-| `CreateQueue` | Not implemented |
+| `CreateQueue` | Implemented |
 | `DeleteQueue` | Not implemented |
 | `ListQueues` | Not implemented |
 | `SendMessage` | Not implemented |
