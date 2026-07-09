@@ -8,7 +8,7 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -o /server .
 
-FROM scratch
+FROM gcr.io/distroless/static-debian12:nonroot
 
 COPY --from=builder /server /server
 

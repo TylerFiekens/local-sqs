@@ -14,8 +14,26 @@ Queues and messages are held in memory — state is lost on restart.
 
 ## Usage
 
+### Go
+
 ```sh
 go run . -port 9324
+```
+
+### Docker
+
+```sh
+docker run -p 9324:9324 tylerfiekens/local-sqs:latest
+```
+
+### Docker Compose
+
+```yaml
+services:
+  local-sqs:
+    image: tylerfiekens/local-sqs:latest
+    ports:
+      - "9324:9324"
 ```
 
 Point your AWS SDK at `http://localhost:9324` with any credentials (not validated).
@@ -44,7 +62,7 @@ make check          # fmt + lint + build + test
 make docker-build   # build Docker image
 ```
 
-A pre-built Docker image will be available in a future release.
+Pre-built images are published to [Docker Hub](https://hub.docker.com/r/tylerfiekens/local-sqs) on every push to `main`.
 
 ## Contributing
 
