@@ -4,7 +4,7 @@ A lightweight, in-memory SQS-compatible server for local development and testing
 
 ## Status
 
-Early development. `CreateQueue`, `DeleteQueue`, `ListQueues`, and `SendMessage` are implemented. Remaining operations are stubs.
+Early development. `CreateQueue`, `DeleteQueue`, `ListQueues`, `SendMessage`, and `ReceiveMessage` are implemented. `DeleteMessage` is the only remaining stub.
 
 ## How it works
 
@@ -30,7 +30,7 @@ The OpenAPI specification is served at `http://localhost:9324/openapi.yaml`.
 | `DeleteQueue` | Implemented |
 | `ListQueues` | Implemented |
 | `SendMessage` | Implemented |
-| `ReceiveMessage` | Not implemented |
+| `ReceiveMessage` | Implemented |
 | `DeleteMessage` | Not implemented |
 
 ## Development

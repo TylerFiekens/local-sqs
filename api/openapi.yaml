@@ -33,6 +33,7 @@ paths:
                 - $ref: "#/components/schemas/DeleteQueueRequest"
                 - $ref: "#/components/schemas/ListQueuesRequest"
                 - $ref: "#/components/schemas/SendMessageRequest"
+                - $ref: "#/components/schemas/ReceiveMessageRequest"
               discriminator:
                 propertyName: Action
       responses:
@@ -46,6 +47,7 @@ paths:
                   - $ref: "#/components/schemas/DeleteQueueResponse"
                   - $ref: "#/components/schemas/ListQueuesResponse"
                   - $ref: "#/components/schemas/SendMessageResponse"
+                  - $ref: "#/components/schemas/ReceiveMessageResponse"
         "400":
           description: Bad request — missing or invalid parameters, or unimplemented action
           content:
@@ -211,6 +213,58 @@ components:
               type: string
               description: MD5 digest of the message body.
               example: 5eb63bbbe01eeed093cb22bb8f5acdc3
+        ResponseMetadata:
+          $ref: "#/components/schemas/ResponseMetadata"
+
+    # -------------------------------------------------------------------------
+    # ReceiveMessage
+    # -------------------------------------------------------------------------
+
+    ReceiveMessageRequest:
+      type: object
+      required:
+        - Action
+        - QueueUrl
+      properties:
+        Action:
+          type: string
+          enum: [ReceiveMessage]
+        QueueUrl:
+          type: string
+          description: Full URL of the queue to receive messages from.
+          example: http://localhost:9324/queue/my-queue
+        MaxNumberOfMessages:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 1
+          description: Maximum number of messages to return. Defaults to 1.
+
+    ReceiveMessageResponse:
+      type: object
+      xml:
+        name: ReceiveMessageResponse
+      properties:
+        ReceiveMessageResult:
+          type: object
+          properties:
+            Message:
+              type: array
+              items:
+                type: object
+                properties:
+                  MessageId:
+                    type: string
+                    example: 5fea7756-0ea4-451a-a703-a558b933e274
+                  ReceiptHandle:
+                    type: string
+                    description: Token used to delete the message via DeleteMessage.
+                  MD5OfBody:
+                    type: string
+                    example: 5eb63bbbe01eeed093cb22bb8f5acdc3
+                  Body:
+                    type: string
+                    example: '{"orderId": "123"}'
         ResponseMetadata:
           $ref: "#/components/schemas/ResponseMetadata"
 
