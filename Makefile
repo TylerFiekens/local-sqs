@@ -1,10 +1,12 @@
 BINARY     := server
 MAIN       := .
 GOFLAGS    := -trimpath
-IMAGE      := local-sqs
+IMAGE      := tylerfiekens/local-sqs
 IMAGE_TAG  ?= latest
+IMAGE_TAGS ?= $(IMAGE):$(IMAGE_TAG)
+PLATFORMS  := linux/amd64,linux/arm64
 
-.PHONY: all build test lint fmt clean docker-build docker-push docker-run
+.PHONY: all build test lint fmt clean docker-build docker-push docker-run docker-buildx
 
 all: fmt lint test build
 
@@ -43,3 +45,8 @@ docker-push:
 
 docker-run:
 	docker run --rm $(IMAGE):$(IMAGE_TAG)
+
+docker-buildx:
+	docker buildx build --platform $(PLATFORMS) \
+		$(foreach tag,$(IMAGE_TAGS),-t $(tag)) \
+		--push .
