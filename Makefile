@@ -12,16 +12,25 @@ build:
 	go build $(GOFLAGS) -o bin/$(BINARY) $(MAIN)
 
 test:
-	go test -race -cover ./...
+	go test ./... -race
+
+test-coverage:
+	go test ./... -race -cover
 
 lint:
-	golangci-lint run ./...
+	go vet ./...
 
 fmt:
-	gofmt -w .
+	go fmt ./...
 
 clean:
 	rm -rf bin/
+
+check:
+	make fmt
+	make lint
+	make build
+	make test-coverage
 
 docker-build:
 	docker build -t $(IMAGE):$(IMAGE_TAG) .
